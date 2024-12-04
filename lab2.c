@@ -238,3 +238,80 @@ char* substr(const char *str, size_t pos, size_t count)
     return new_str;
 }
 
+// --- 9 ---
+
+int findlast(const char *str, char symbol)
+{
+    int l = (int)strlen(str);
+    for (int i = l-1; i >= 0; i--)
+    {
+        if (str[i] == symbol)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int strfindlastof(const char *str, const char *symbols)
+{
+    int l = (int)strlen(symbols);
+    int k = -1;
+    int buff = 0;
+    for (int i = 0; i < l; i++)
+    {
+        buff = findlast(str, symbols[i]);
+        if (buff > k)
+        {
+            k = buff;
+        }
+    }
+    return k;
+}
+
+// --- 10 ---
+
+int to_valid(char c)
+{
+    if (c >= 65 && c <= 90)
+    {
+        return (int)c;
+    }
+    else if (c >= 97 && c <= 122)
+    {
+        return (int)(c - 32);
+    }
+    return 0;
+}
+
+int strispalindrome(const char *str)
+{
+    int l = (int)strlen(str);
+    int p1 = 0;
+    int p2 = l-1;
+    while (p1 < p2)
+    {
+        if (!to_valid(str[p1]))
+        {
+            p1++;
+        }
+        else if (!to_valid(str[p2]))
+        {
+            p2--;
+        }
+        else
+        {
+            if (to_valid(str[p1]) != to_valid(str[p2]))
+            {
+                return 0;
+            }
+            else
+            {
+                p1++;
+                p2--;
+            }
+        }
+    }
+    return 1;
+}
+
