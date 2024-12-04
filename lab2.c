@@ -126,3 +126,115 @@ char* strreverse(char *str)
     }
     return new_str;
 }
+
+// --- 5 ---
+
+char* strtrim(char *str)
+{
+    int l = (int)strlen(str);
+    int low = 0;
+    while (low < l && (str[low] <= 32 || str[low] >= 127))
+    {
+        low++;
+    }
+    if (low == l)
+    {
+        return NULL;
+    }
+    int high = l-1;
+    while (str[high] <= 32 || str[high] >= 127)
+    {
+        high--;
+    }
+    char* new_str = (char*)malloc(s_char * (high - low + 1));
+    if (new_str == NULL)
+    {
+        return NULL;
+    }
+    for (int i = 0; i < high - low + 1; i++)
+    {
+        new_str[i] = str[low + i];
+    }
+    return new_str;
+}
+
+// --- 6 ---
+
+char* strrmchar(char *str, char symbol)
+{
+    int l = (int)strlen(str);
+    char* cpstr = (char*)malloc(s_char * l);
+    if (cpstr == NULL)
+    {
+        return NULL;
+    }
+    memmove(cpstr, str, (size_t)l);
+    int delta = 0;
+    for (int i = 0; i < l; i++)
+    {
+        if (str[i] == symbol)
+        {
+            memmove(cpstr + i - delta, str + i + 1, (size_t)(l-i-1));
+            delta++;
+        }
+    }
+    char* new_str = (char*)malloc(s_char * (l - delta));
+    if (new_str == NULL)
+    {
+        free(cpstr);
+        return NULL;
+    }
+    memmove(new_str, cpstr, (size_t)(l-delta));
+    free(cpstr);
+    return new_str;
+}
+
+// --- 7 ---
+
+size_t strcountchar(const char *str, char symbol)
+{
+    int l = (int)strlen(str);
+    char* cpstr = (char*)malloc(s_char * l);
+    if (cpstr == NULL)
+    {
+        return 0;
+    }
+    memcpy(cpstr, str, (size_t)l);
+    size_t count = 0;
+    char* pointer = strchr(cpstr, symbol);
+    while (pointer != NULL)
+    {
+        count++;
+        *pointer = (char)(symbol + 1);
+        pointer = strchr(cpstr, symbol);
+    }
+    free(cpstr);
+    return count;
+}
+
+// --- 8 ---
+
+char* substr(const char *str, size_t pos, size_t count)
+{
+    size_t l = (size_t)strlen(str);
+    size_t end_pos = pos + count;
+    if (end_pos > l)
+    {
+        end_pos = l;
+    }
+    if (end_pos <= pos)
+    {
+        return NULL;
+    }
+    char* new_str = (char*)malloc(s_char * (end_pos - pos));
+    if (new_str == NULL)
+    {
+        return NULL;
+    }
+    for (int i = 0; i < (int)(end_pos - pos); i++)
+    {
+        new_str[i] = str[pos+i];
+    }
+    return new_str;
+}
+
