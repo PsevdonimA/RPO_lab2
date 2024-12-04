@@ -4,6 +4,13 @@
 
 const int s_char = sizeof(char);
 
+enum Type{
+    UNKNOWN = 0,
+    DIGIT,
+    DOT,
+    SLASH
+};
+
 int abs(int x)
 {
     if (x < 0)
@@ -11,6 +18,15 @@ int abs(int x)
         return -x;
     }
     return x;
+}
+
+int min(int x, int y)
+{
+    if (x < y)
+    {
+        return x;
+    }
+    return y;
 }
 
 // --- 1 ---
@@ -205,7 +221,7 @@ size_t strcountchar(const char *str, char symbol)
     while (pointer != NULL)
     {
         count++;
-        *pointer = (char)(symbol + 1);
+        *pointer = (char)((symbol + 1) % 256);
         pointer = strchr(cpstr, symbol);
     }
     free(cpstr);
@@ -313,5 +329,283 @@ int strispalindrome(const char *str)
         }
     }
     return 1;
+}
+
+// --- 11 ---
+
+size_t strcountwords(const char *str)
+{
+    int l = (int)strlen(str);
+    int cur_status = 0;
+    size_t count = 0;
+    for (int i = 0; i < l; i++)
+    {
+        if (cur_status == 0 && str[i] != ' ')
+        {
+            cur_status = 1;
+            count++;
+        }
+        else if (cur_status == 1 && str[i] == ' ')
+        {
+            cur_status = 0;
+        }
+    }
+    return count;
+}
+
+// --- 12 ---
+
+char** split(const char* str, int n)
+{
+    int l = (int)strlen(str);
+    char** arr = (char**)malloc(sizeof(char*) * n);
+    if (arr == NULL)
+    {
+        return NULL;
+    }
+    int err = 0;
+    for (int i = 0; i < n; i++)
+    {
+        arr[i] = (char*)malloc(s_char * l);
+        if (arr[i] == NULL)
+        {
+            err = 1;
+        }
+    }
+    if (err)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            free(arr[i]);
+            free(arr);
+            return NULL;
+        }
+    }
+    int cur_status = 0;
+    int word = 0;
+    int pos = 0;
+    for (int i = 0; i < l; i++)
+    {
+        if (cur_status == 0 && to_valid(str[i]))
+        {
+            cur_status = 1;
+            arr[word][pos] = str[i];
+            pos++;
+        }
+        else if (cur_status == 1 && to_valid(str[i]))
+        {
+            arr[word][pos] = str[i];
+            pos++;
+        }
+        else if (cur_status == 1 && !to_valid(str[i]))
+        {
+            cur_status = 0;
+            pos = 0;
+            word++;
+        }
+    }
+    return arr;
+}
+
+int min_word(const char* w1, const char* w2)
+{
+    int l1 = (int)strlen(w1);
+    int l2 = (int)strlen(w2);
+    char c1, c2;
+    for (int i = 0; i < min(l1, l2); i++)
+    {
+        c1 = w1[i];
+        c2 = w2[i];
+        if (c1 >= 97 && c1 <= 122)
+        {
+            c1 -= 32;
+        }
+        if (c2 >= 97 && c2 <= 122)
+        {
+            c2 -= 32;
+        }
+        if (c1 < c2)
+        {
+            return 1;
+        }
+        else if (c1 > c2)
+        {
+            return 2;
+        }
+    }
+    if (l1 < l2)
+    {
+        return 1;
+    }
+    else if (l1 > l2)
+    {
+        return 2;
+    }
+    return 0;
+}
+
+void sort(char** arr, int n)
+{
+    char* buff = NULL;
+    for (int i = 0; i < n-1; i++)
+    {
+        for (int j = 0; j < n-i-1; j++)
+        {
+            if (min_word(arr[j], arr[j+1]) == 2)
+            {
+                buff = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = buff;
+            }
+        }
+    }
+}
+
+char** strtowords(const char *str, size_t *count)
+{
+    size_t n = strcountwords(str);
+    *count = n;
+    if (n == 0)
+    {
+        return NULL;
+    }
+    char** arr = split(str, (int)n);
+    if (arr == NULL)
+    {
+        *count = 0;
+        return NULL;
+    }
+    sort(arr, n);
+    return arr;
+}
+
+// --- 13 ---
+
+int symbol_type(char c)
+{
+    if (c >= 48 && c <= 57)
+    {
+        return DIGIT;
+    }
+    else if (c == 46)
+    {
+        return DOT;
+    }
+    else if (c == 47)
+    {
+        return SLASH;
+    }
+    return UNKNOWN;
+}
+
+int strisipv4(const char* str)
+{
+    int l = (int)strlen(str);
+    int cur_dig = 0;
+    int dots = 0;
+    int slash = 0;
+    int type = 0;
+    int arr[5] = {-1, -1, -1, -1};
+    int buff = 0;
+    for (int i = 0; i < l; i++)
+    {
+        type = symbol_type(str[i]);
+        if (type == UNKNOWN)
+        {
+            return 0;
+        }
+        else if (type == DIGIT)
+        {
+            if (cur_dig == 3 || (cur_dig == 2 && slash))
+            {
+                return 0;
+            }
+            else
+            {
+                cur_dig++;
+                buff *= 10;
+                buff += (int)str[i] - 48;
+                if (buff < 10 && cur_dig > 1)
+                {
+                    return 0;
+                }
+            }
+        }
+        else if (type == DOT)
+        {
+            if (dots == 3 || cur_dig == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                arr[dots] = buff;
+                buff = 0;
+                cur_dig = 0;
+                dots++;
+            }
+        }
+        else if (type == SLASH)
+        {
+            if (dots != 3 || cur_dig == 0 || slash == 1)
+            {
+                return 0;
+            }
+            else
+            {
+                arr[dots] = buff;
+                buff = 0;
+                cur_dig = 0;
+                slash = 1;
+            }
+        }
+    }
+    if (cur_dig == 0)
+    {
+        return 0;
+    }
+    if (slash)
+    {
+        if (buff < 0 || buff > 32)
+        {
+            return 0;
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (arr[i] < 0 || arr[i] > 255)
+            {
+                return 0;
+            }
+        }
+    }
+    else
+    {
+        arr[3] = buff;
+        for (int i = 0; i < 4; i++)
+        {
+            if (arr[i] < 0 || arr[i] > 255)
+            {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+// --- 14 ---
+
+size_t* strcountchars(const char *str)
+{
+    size_t* new_str = (size_t*)malloc(sizeof(size_t) * 256);
+    if (new_str == NULL)
+    {
+        return NULL;
+    }
+    new_str[0] = 0;
+    for (int i = 1; i < 256; i++)
+    {
+        new_str[i] = strcountchar(str, (char)i);
+    }
+    return new_str;
 }
 

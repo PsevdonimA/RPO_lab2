@@ -11,5 +11,9 @@ size_t strcountchar(const char *str, char symbol);
 char* substr(const char *str, size_t pos, size_t count);
 int strfindlastof(const char *str, const char *symbols);
 int strispalindrome(const char *str);
+size_t strcountwords(const char *str);
+char** strtowords(const char *str, size_t *count);
+int strisipv4(const char *str);
+size_t* strcountchars(const char *str);
 
 #endif
