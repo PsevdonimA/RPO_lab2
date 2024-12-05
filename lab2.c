@@ -596,15 +596,19 @@ int strisipv4(const char* str)
 
 size_t* strcountchars(const char *str)
 {
+    int l = (int)strlen(str);
     size_t* new_str = (size_t*)malloc(sizeof(size_t) * 256);
     if (new_str == NULL)
     {
         return NULL;
     }
-    new_str[0] = 0;
-    for (int i = 1; i < 256; i++)
+    for (int i = 0; i < 256; i++)
     {
-        new_str[i] = strcountchar(str, (char)i);
+        new_str[i] = 0;
+    }
+    for (int i = 0; i < l; i++)
+    {
+        new_str[(int)str[i]]++;
     }
     return new_str;
 }
